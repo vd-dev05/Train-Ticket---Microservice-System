@@ -1,0 +1,36 @@
+# Node modules (không cần đẩy thư mục này vì dependencies có thể cài lại từ package.json)
+**/node_modules/
+
+# Environment files
+**/.env
+**/.env.*
+
+
+# Log files
+*.log
+logs/
+
+# Build output, artifacts, và thư mục coverage (nếu có)
+dist/
+build/
+coverage/
+
+# Docker-related temporary files, nếu bạn không muốn chia sẻ các file override
+docker-compose.override.yml
+
+
+
+# Editor/IDE settings (nếu không muốn chia sẻ cấu hình cá nhân)
+.vscode/
+.idea/
+
+# Temporary files and backups
+*.tmp
+*.swp
+*~
+
+# Cache folders (nếu có)
+.cache/
+
+# Temporary files and backups
+Docs.md
