@@ -2,18 +2,18 @@
 require('module-alias/register');
 //  Packages
 const express = require("express");
-const dotenv = require('dotenv');
+// const dotenv = require('dotenv');
 const DataBaseConnectionMongoDB = require("./database");
 const pinoHttp = require('pino-http');
 const logger = require('./config/log/index.js');
 const redisClient = require('./cache/RedisClient.js');
-const { getCache } = require("@/cache/cacheHelper.js");
 const RootRouter = require("@/routes/index.js");
 
 
 // Configuration
-dotenv.config();
+require('dotenv').config();
 const PORT = process.env.PORT || 3000;
+
 
 
 

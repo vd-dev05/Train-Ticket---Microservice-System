@@ -7,5 +7,5 @@ const usersAuth = express.Router()
 
 // enpoint : http://{url}/api/v1/auth/login
 usersAuth.post('/login',logTimeRequest,authMiddlewareUser.login, authUser.login) 
-
+usersAuth.post('/signup',logTimeRequest,authMiddlewareUser.signup, authUser.signup)
 module.exports = usersAuth;

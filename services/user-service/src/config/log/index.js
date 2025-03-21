@@ -7,6 +7,11 @@ const logger = pino({
     level(label, number) {
       return { level: label };
     },
+    logSuccess(message) {
+      if (process.env.LOG_LEVEL === 'success') {
+        return { success: message };
+      }
+    },
   },
 });
 
