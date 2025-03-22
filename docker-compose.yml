@@ -13,6 +13,36 @@ services:
     image: redis
     ports:
       - "6379:6379"
+  rabbitmq : 
+    image: rabbitmq 
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: rabbitmq
+
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  booking-service:
+    build: ./services/booking-service
+    develop:
+      watch:
+        - action: sync
+          path: ./services/booking-service
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    command: bun run dev
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./services/booking-service/.env
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
 
   user-service:
     build:
