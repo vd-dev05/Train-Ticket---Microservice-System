@@ -1,7 +1,7 @@
 const UserModel = require("@/model/UserModel.js");
 const logger = require("@/config/log/index.js");
 const { getCache, setCache } = require("@/cache/cacheHelper.js");
-const { hashPassword } = require("@/utils/hash");
+const { hashPassword , comparePassword} = require("@/utils/hash");
 
 const authMiddlewareUser = {
     signup : async function (req, res, next) {
@@ -9,10 +9,10 @@ const authMiddlewareUser = {
         // Return success or failure message
 
         try {
-            const {username , password , type , fullname , name } = req.body;
+            const {username , password , type , fullname  } = req.body;
             const regex =  /[<>{}()[\];:'"\\/!@#$%^&*=+?]/g; 
         
-            if (regex.test(username) || regex.test(fullname) || regex.test(name)) {
+            if (regex.test(username) || regex.test(fullname) || regex.test(fullname)) {
                 return res.status(401).send({
                     success: false,
                     message: "Invalid character in input"
@@ -25,8 +25,8 @@ const authMiddlewareUser = {
                 req.data = {
                     username : username,
                     password : hashedPassword,
-                    fullname : fullname,
-                    name : name
+                    passwordCache : password, 
+                    fullName : fullname,
                 }
                 
                 return next()
@@ -53,33 +53,40 @@ const authMiddlewareUser = {
             const key = `users:profile:${req.body.username + req.body.password}`
             const cacheUses = await getCache(key);
             // console.log(cacheUses);
-            
+            const user = await UserModel.findOne({username : req.body.username });
             if (!cacheUses || cacheUses === null )  {
-
-                const user = await UserModel.findOne({username : req.body.username});
-
                 if (! user) {
                     throw new Error("Invalid user");
                 } else {
-                    const key = `users:profile:${ user.username}${req.body.password}`;
-                    await setCache(key, JSON.stringify({
-                        _id: user._id,
-                        email: user.email,
-                        username: user.username,
-                        name : user.name
-                    }), 3600);
-                    console.log("💾 Data cached in Redis for key:", key);
-                    req.payload = {
-                        id: user._id,
-                        email: user.email,
-                        username: user.username,
-                        name : user.name
-                    }
+
+                    // const key = `users:profile:${ user.username}${req.body.password}`;
+                    // await setCache(key, JSON.stringify({
+                    //     _id: user._id,
+                    //     email: user.email,
+                    //     username: user.username,
+                    //     name : user.name
+                    // }), 3600);
+                    // console.log("💾 Data cached in Redis for key:", key);
+                    // req.payload = {
+                    //     id: user._id,
+                    //     email: user.email,
+                    //     username: user.username,
+                    //     name : user.name
+                    // }
                     next();
                 }    
             } else {
+                const checkPassword = comparePassword(req.body.password, user.password);
+                console.log(checkPassword);
                 
-                console.log(JSON.parse(cacheUses));               
+                if (!checkPassword) {
+                    throw new Error("Invalid password");
+                } else {
+                    req.token = cacheUses
+                    next();
+                }
+          
+                         
             }
             // const cacheUses = await getCache("testKey");
             // console.log(test);

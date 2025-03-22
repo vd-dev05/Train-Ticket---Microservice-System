@@ -18,6 +18,14 @@ module.exports = {
         });
     },
     verifyToken : (token , type ) => {
-        return jwt.verify(token, type === 'access'? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET);
+        try {
+            const secret = type === "access_token" ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET;
+            return jwt.verify(token, secret);
+        } catch (error) {
+            return null;
+        }
+    },
+    decodeToken : (token) => {
+        return jwt.decode(token);
     }
 }
